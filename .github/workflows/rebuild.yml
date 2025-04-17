@@ -3,6 +3,8 @@ name: Rebuild and Deploy
 on:
   workflow_dispatch: # Allow manual runs
   repository_dispatch: # Triggered by child repo
+permissions:
+  contents: write
 
 jobs:
   build-and-deploy:
