@@ -1,0 +1,3 @@
+[submodule "child-repo"]
+	path = child-repo
+	url = https://github.com/Nimra-stellarstack/child-repo-testing.git
