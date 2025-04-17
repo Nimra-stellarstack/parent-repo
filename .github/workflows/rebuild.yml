@@ -15,16 +15,13 @@ jobs:
           submodules: recursive # Ensures nested submodules are fetched
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update submodule to latest commit
+      - name: Update submodule to latest commit on default branch
         run: |
-          cd child-repo
-          git fetch origin
-          git checkout origin/main  
-          cd ..
-          git add child-repo
+          git submodule update --remote --force
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Update submodule to latest commit" || echo "No changes to commit"
+          git add child-repo
+          git commit -m "Update child submodule to latest commit" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref }}
 
       - name: Simulated build/deploy process
