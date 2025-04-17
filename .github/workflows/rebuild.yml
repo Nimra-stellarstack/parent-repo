@@ -1,19 +1,31 @@
-name: Rebuild Parent
+name: Rebuild and Deploy
 
 on:
-  workflow_dispatch: # Manual trigger
+  workflow_dispatch: # Allow manual runs
   repository_dispatch: # Triggered by child repo
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout parent
+      - name: Checkout parent repo with submodules
         uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive # Ensures nested submodules are fetched
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build/Deploy logic
+      - name: Update submodule to latest commit on default branch
         run: |
-          echo "Rebuilding parent because child updated!"
-          # Add build/deploy steps here
+          git submodule update --remote --merge
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add child-repo
+          git commit -m "Update child submodule to latest commit" || echo "No changes to commit"
+          git push origin HEAD:${{ github.ref }}
+
+      - name: Simulated build/deploy process
+        run: |
+          echo "🛠️ Building and deploying..."
+          echo "✅ Child repo content:"
+          ls -la child-repo
