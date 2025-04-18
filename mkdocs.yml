@@ -12,3 +12,10 @@ nav:
 - Readme: readme.md
 - Testing: testing.md
 - Usage: usage.md
+- Child Docs:
+  - Performance: child-repo/Performance.md
+  - Advantages: child-repo/advantages.md
+  - Contribution: child-repo/contribution.md
+  - Readme: child-repo/readme.md
+  - Testing: child-repo/testing.md
+  - Usage: child-repo/usage.md
