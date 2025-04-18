@@ -1,68 +1,60 @@
+# scripts/sync_child_docs.py
+
 import os
 import shutil
-from pathlib import Path
 import yaml
 
-CHILD_REPO = Path("child-repo")
-TARGET_DOCS = Path("docs")
-MKDOCS_YML = Path("mkdocs.yml")
+CHILD_REPO = "child-repo"
+DOCS_DIR = "docs"
+MKDOCS_YML = "mkdocs.yml"
 
-def copy_md_files():
-    copied = []
-    for file in CHILD_REPO.rglob("*.md"):
-        relative_path = file.relative_to(CHILD_REPO)
+def find_md_files(base_path):
+    md_files = []
+    for root, _, files in os.walk(base_path):
+        for file in files:
+            if file.endswith(".md"):
+                full_path = os.path.join(root, file)
+                rel_path = os.path.relpath(full_path, base_path)
+                md_files.append(rel_path)
+    return md_files
 
-        # Fix case: lowercase README.md to readme.md
-        if relative_path.name.lower() == "readme.md":
-            relative_path = relative_path.with_name("readme.md")
+def sync_docs():
+    # Step 1: find all child .md files
+    child_files = find_md_files(CHILD_REPO)
 
-        dest_path = TARGET_DOCS / relative_path
-        dest_path.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(file, dest_path)
-        copied.append(dest_path.relative_to(TARGET_DOCS))
-    return copied
+    # Step 2: remove previously synced .md files in docs/ not in child anymore
+    docs_files = find_md_files(DOCS_DIR)
+    for file in docs_files:
+        if file.lower() == "readme.md":
+            continue  # Keep the manually created one
+        if file not in child_files:
+            os.remove(os.path.join(DOCS_DIR, file))
 
+    # Step 3: copy files from child to docs/
+    for file in child_files:
+        src = os.path.join(CHILD_REPO, file)
+        dst = os.path.join(DOCS_DIR, file.lower())  # Normalize filenames
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy2(src, dst)
 
-def build_nav(files):
-    nav = {}
+def update_mkdocs_yml():
+    nav = [{"Home": "index.md"}]
 
-    for path in files:
-        parts = list(path.parts)
-        current = nav
-        for part in parts[:-1]:
-            current = current.setdefault(part, {})
-        title = path.stem.replace("-", " ").title()
-        current[title] = str(path).replace("\\", "/")
+    docs_files = sorted(find_md_files(DOCS_DIR))
+    for file in docs_files:
+        if file == "index.md":
+            continue
+        title = os.path.splitext(os.path.basename(file))[0].replace("-", " ").capitalize()
+        nav.append({title: file})
 
-    def convert(nav_dict):
-        nav_list = []
-        for k, v in nav_dict.items():
-            if isinstance(v, dict):
-                nav_list.append({k: convert(v)})
-            else:
-                nav_list.append({k: v})
-        return nav_list
+    with open(MKDOCS_YML, "r") as f:
+        config = yaml.safe_load(f)
 
-    return convert(nav)
-
-def write_mkdocs_yml(nav):
-    content = {
-        "site_name": "My Project Docs",
-        "theme": {
-            "name": "material",
-            "features": ["navigation.tabs"]
-        },
-        "nav": nav
-    }
+    config["nav"] = nav
 
     with open(MKDOCS_YML, "w") as f:
-        yaml.dump(content, f, sort_keys=False)
+        yaml.dump(config, f, sort_keys=False)
 
 if __name__ == "__main__":
-    print("Copying .md files from child-repo...")
-    md_files = copy_md_files()
-    print("Generating navigation...")
-    nav = build_nav(md_files)
-    print("Writing mkdocs.yml...")
-    write_mkdocs_yml(nav)
-    print("Done.")
+    sync_docs()
+    update_mkdocs_yml()
