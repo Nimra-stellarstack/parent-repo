@@ -33,14 +33,14 @@ jobs:
           git submodule sync --recursive
           git submodule update --init --recursive
 
-      - name: Pull submodule to latest commit
+      - name: Update submodule to latest commit on remote
         run: |
-          git submodule update --remote --merge
+          git submodule update --remote --force
           git add child-repo
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "⬆️ Update child submodule to latest commit" || echo "No changes to commit"
-          git push origin HEAD:${{ github.ref }} || echo "No changes to push"
+          git commit -m "🔄 Update child-repo submodule to latest commit" || echo "No changes to commit"
+          git push origin HEAD:${GITHUB_REF##*/} || echo "No changes to push"
 
       - name: Sync child docs and update mkdocs.yml
         run: python scripts/sync_child_docs.py
