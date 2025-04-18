@@ -3,6 +3,8 @@ name: Rebuild and Deploy
 on:
   workflow_dispatch: # Allow manual runs
   repository_dispatch: # Triggered by child repo
+    types: [child-updated]
+
 permissions:
   contents: write
 
@@ -16,6 +18,13 @@ jobs:
         with:
           submodules: recursive # Ensures nested submodules are fetched
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install PyYAML (for mkdocs.yml generation)
+        run: pip install pyyaml
 
       - name: Update submodule to latest commit on default branch
         run: |
@@ -24,6 +33,16 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add child-repo
           git commit -m "Update child submodule to latest commit" || echo "No changes to commit"
+          git push origin HEAD:${{ github.ref }}
+      - name: Sync child docs and update mkdocs.yml
+        run: python scripts/sync_child_docs.py
+
+      - name: Commit copied docs + mkdocs.yml
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs mkdocs.yml
+          git commit -m "🔄 Sync docs from child-repo" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref }}
 
       - name: Simulated build/deploy process

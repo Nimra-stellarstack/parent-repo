@@ -1,0 +1,15 @@
+site_name: My Project Docs
+theme:
+  name: material
+  features:
+    - navigation.tabs
+
+nav:
+  - Home: index.md
+  - Commands: test.md
+  - Docs:
+    - Child README: readme.md 
+    - child Testing: testing.md
+  # - CLI:
+  #   - CLI Doc: 'test.md'
+ 
