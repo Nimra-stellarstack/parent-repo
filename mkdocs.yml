@@ -4,8 +4,8 @@ theme:
   features:
   - navigation.tabs
 nav:
+- Advantages: advantages.md
 - Testing: testing.md
 - Readme: readme.md
 - Performance: Performance.md
-- Working: working.md
 - Usage: usage.md
