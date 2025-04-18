@@ -1,12 +1,14 @@
 name: Rebuild and Deploy
 
 on:
-  workflow_dispatch: # Allow manual runs
+  workflow_dispatch: # Manual run
   repository_dispatch: # Triggered by child repo
     types: [child-updated]
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build-and-deploy:
@@ -24,8 +26,8 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Install PyYAML (for mkdocs.yml generation)
-        run: pip install pyyaml
+      - name: Install dependencies
+        run: pip install pyyaml mkdocs mkdocs-material
 
       - name: Ensure submodule tracks remote main
         run: |
@@ -45,16 +47,13 @@ jobs:
       - name: Sync child docs and update mkdocs.yml
         run: python scripts/sync_child_docs.py
 
-      - name: Commit copied docs + mkdocs.yml
+      - name: Commit synced docs and mkdocs.yml
         run: |
-          git config user.name github-actions[bot]
+          git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs mkdocs.yml
           git commit -m "🔄 Sync docs from child-repo" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref }} || echo "No changes to push"
 
-      - name: Simulated build/deploy process
-        run: |
-          echo "🛠️ Building and deploying..."
-          echo "✅ Child repo content:"
-          ls -la child-repo
+      - name: Deploy to GitHub Pages with MkDocs
+        run: mkdocs gh-deploy --force
