@@ -16,8 +16,9 @@ jobs:
       - name: Checkout parent repo with submodules
         uses: actions/checkout@v4
         with:
-          submodules: recursive # Ensures nested submodules are fetched
+          submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -26,14 +27,24 @@ jobs:
       - name: Install PyYAML (for mkdocs.yml generation)
         run: pip install pyyaml
 
-      - name: Update submodule to latest commit on default branch
+      - name: Set submodule to track main branch
         run: |
-          git submodule update --remote --force
+          git config -f .gitmodules submodule.child-repo.branch main
+          git submodule sync --recursive
+          git submodule update --init --recursive
+
+      - name: Update submodule to latest commit on remote
+        run: |
+          cd child-repo
+          git checkout main
+          git pull origin main
+          cd ..
+          git add child-repo
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add child-repo
-          git commit -m "Update child submodule to latest commit" || echo "No changes to commit"
-          git push origin HEAD:${{ github.ref }}
+          git commit -m "🔄 Update child-repo submodule to latest commit" || echo "No changes to commit"
+          git push origin HEAD:${{ github.ref }} || echo "No changes to push"
+
       - name: Sync child docs and update mkdocs.yml
         run: python scripts/sync_child_docs.py
 
@@ -43,7 +54,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs mkdocs.yml
           git commit -m "🔄 Sync docs from child-repo" || echo "No changes to commit"
-          git push origin HEAD:${{ github.ref }}
+          git push origin HEAD:${{ github.ref }} || echo "No changes to push"
 
       - name: Simulated build/deploy process
         run: |

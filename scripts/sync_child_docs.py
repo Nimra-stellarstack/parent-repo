@@ -11,11 +11,17 @@ def copy_md_files():
     copied = []
     for file in CHILD_REPO.rglob("*.md"):
         relative_path = file.relative_to(CHILD_REPO)
+
+        # Fix case: lowercase README.md to readme.md
+        if relative_path.name.lower() == "readme.md":
+            relative_path = relative_path.with_name("readme.md")
+
         dest_path = TARGET_DOCS / relative_path
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(file, dest_path)
         copied.append(dest_path.relative_to(TARGET_DOCS))
     return copied
+
 
 def build_nav(files):
     nav = {}
@@ -53,10 +59,10 @@ def write_mkdocs_yml(nav):
         yaml.dump(content, f, sort_keys=False)
 
 if __name__ == "__main__":
-    print("📂 Copying .md files from child-repo...")
+    print("Copying .md files from child-repo...")
     md_files = copy_md_files()
-    print("🧭 Generating navigation...")
+    print("Generating navigation...")
     nav = build_nav(md_files)
-    print("📝 Writing mkdocs.yml...")
+    print("Writing mkdocs.yml...")
     write_mkdocs_yml(nav)
-    print("✅ Done.")
+    print("Done.")
