@@ -5,6 +5,7 @@ theme:
   - navigation.tabs
 nav:
 - Testing: testing.md
-- Readme: README.md
+- Readme: readme.md
+- Performance: Performance.md
 - Working: working.md
 - Usage: usage.md
