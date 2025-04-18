@@ -5,13 +5,7 @@ theme:
   - navigation.tabs
 nav:
 - Home: index.md
-- Performance: Performance.md
-- Readme: README.md
-- Advantages: advantages.md
-- Performance: performance.md
-- Readme: readme.md
 - Testing: testing.md
-- Usage: usage.md
 - Child Docs:
   - Performance: child-repo/Performance.md
   - Advantages: child-repo/advantages.md
