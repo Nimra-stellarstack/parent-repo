@@ -10,7 +10,7 @@ nav:
   - Performance: child-repo/Performance.md
   - Advantages: child-repo/advantages.md
   - Contribution: child-repo/contribution.md
-  - Newfile: child-repo/newfile.md
   - Readme: child-repo/readme.md
   - Testing: child-repo/testing.md
+  - Updated test: child-repo/updated-test.md
   - Usage: child-repo/usage.md
