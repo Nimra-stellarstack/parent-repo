@@ -10,6 +10,11 @@ def ensure_docs_child_path():
     os.makedirs(DOCS_CHILD_PATH, exist_ok=True)
 
 def copy_markdown_files():
+    # Clean the child docs folder first to remove outdated files
+    if os.path.exists(DOCS_CHILD_PATH):
+        shutil.rmtree(DOCS_CHILD_PATH)
+    os.makedirs(DOCS_CHILD_PATH, exist_ok=True)
+
     for root, dirs, files in os.walk(CHILD_REPO_PATH):
         for file in files:
             if file.endswith(".md"):
@@ -18,6 +23,7 @@ def copy_markdown_files():
 
                 os.makedirs(os.path.dirname(dest_path), exist_ok=True)
 
+                # Normalize README as lowercase
                 if os.path.basename(file).lower() == "readme.md":
                     dest_path = os.path.join(os.path.dirname(dest_path), "readme.md")
 

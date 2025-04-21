@@ -37,7 +37,10 @@ jobs:
 
       - name: Update submodule to latest commit on remote
         run: |
-          git submodule update --remote --force
+          cd child-repo
+          git checkout main
+          git pull origin main
+          cd ..
           git add child-repo
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
