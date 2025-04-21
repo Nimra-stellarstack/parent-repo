@@ -6,9 +6,6 @@ theme:
 nav:
 - Home: index.md
 - Testing: testing.md
-- Child Docs: []
-- Child Docs: []
-- Child Docs: []
 - Child Docs:
   - Performance: child-repo/Performance.md
   - Advantages: child-repo/advantages.md

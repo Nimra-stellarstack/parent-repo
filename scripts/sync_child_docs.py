@@ -32,40 +32,27 @@ def load_existing_nav(yml_path):
         return yaml.safe_load(f)
 
 def update_mkdocs_nav(existing):
-    # Separate original and child docs
-    original_nav = []
-    child_nav = []
-
+    # Clear out any existing 'Child Docs' sections
+    cleaned_nav = []
     for item in existing.get("nav", []):
         if isinstance(item, dict):
-            key, value = list(item.items())[0]
-            if isinstance(value, list):
-                new_section = []
-                for subitem in value:
-                    if isinstance(subitem, dict):
-                        sub_key, sub_value = list(subitem.items())[0]
-                        if not sub_value.startswith("child-repo/"):
-                            new_section.append(subitem)
-                    else:
-                        new_section.append(subitem)
-                original_nav.append({key: new_section})
-            elif isinstance(value, str):
-                if not value.startswith("child-repo/"):
-                    original_nav.append(item)
+            key = list(item.keys())[0]
+            if key != "Child Docs":
+                cleaned_nav.append(item)
         else:
-            original_nav.append(item)
+            cleaned_nav.append(item)
 
-    # Collect child files
+    # Collect child files into new nav entries
+    child_nav = []
     for root, _, files in os.walk(DOCS_CHILD_PATH):
         for file in sorted(files):
             if file.endswith(".md"):
                 rel_path = os.path.relpath(os.path.join(root, file), "docs")
                 child_nav.append(build_nav_for_file(rel_path))
 
-    # Insert new structure under a grouped section
-    original_nav.append({"Child Docs": child_nav})
-
-    existing["nav"] = original_nav
+    # Append cleaned original nav with fresh Child Docs
+    cleaned_nav.append({"Child Docs": child_nav})
+    existing["nav"] = cleaned_nav
     return existing
 
 def write_updated_mkdocs(config):
