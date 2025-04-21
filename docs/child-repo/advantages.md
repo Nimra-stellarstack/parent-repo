@@ -19,13 +19,3 @@ Check out our [CHANGELOG.md](./docs/CHANGELOG.md) for details.
 Copyright 2020-2021 © The Backstage Authors. All rights reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our Trademark Usage page: https://www.linuxfoundation.org/trademark-usage
 
 Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
-
-## Contributing
-
-Check out our [CONTRIBUTING](./docs/CONTRIBUTING.md) for more details.
-
-[mkdocs/mkdocs]: https://github.com/mkdocs/mkdocs
-[mkdocs-plugin-template]: https://github.com/byrnereese/mkdocs-plugin-template
-[pypi]: https://pypi.org
-[mkdocs]: https://www.mkdocs.org
-[github codeowners]: https://help.github.com/en/articles/about-code-owners
